@@ -184,12 +184,15 @@ data_reference <-
   ungroup()
 
 ## join cohort rates and reference population size ----
+
 data_combined <-
   left_join(
     data_cohort,
     data_reference,
     by = c(standardisation_strata)
   )
+
+## TODO may need a test here to ensure factors have been merged as intended
 
 ## define function to standardise rates within specified subgroups ----
 rounded_rates <- function(data, min_count, method, ...){
