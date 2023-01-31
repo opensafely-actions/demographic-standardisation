@@ -36,9 +36,10 @@ library("optparse")
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
+  print("zero length args detected")
   # use for interactive testing
-  df_input <- "output/measures/measure_death.csv"
-  dir_output <-  "output/standardised/"
+  df_input <- "output/measures/measure_death.feather"
+  dir_output <-  "output/standardised"
   standardisation_strata <- "year;sex;ageband5year;region"
   subgroups <- "overall;sex;ageband20year;region"
   numerator <- "death_1year"
@@ -52,7 +53,7 @@ if(length(args)==0){
 
   option_list <- list(
     make_option("--df_input", type = "character", default = NULL,
-                help = "Input dataset .csv filename [default %default]. (ideally should use feather to preserve factor levels -- to discuss)",
+                help = "Input dataset .feather filename [default %default]. feather format is enforced to preserve factor levels, and ensure a separate script to make adding subgroups, factorising variables etc, is used as standard.",
                 metavar = "filename.feather"),
     make_option("--dir_output", type = "character", default = NULL,
                 help = "Output directory [default %default].",
@@ -126,14 +127,7 @@ osround <- function(x, min_count=5, method="mid"){
 # import cohort rates data ----
 
 ## import ----
-data_cohort0 <-read_csv(df_input) %>%
-  mutate(
-    # these operations should somehow be either automated or pre-applied because they ensure the reference population can be appropriately joined
-    year = as.integer(lubridate::year(date)),
-    sex = factor(sex, levels=c("F", "M"), labels= c("Female", "Male")),
-    ageband20year = cut(as.numeric(str_extract(ageband5year, "^\\d+")), c(0,20,40,60, 80, Inf), right = FALSE),
-    overall="overall"
-  )
+data_cohort0 <- arrow::read_feather(df_input)
 
 stopifnot("standardisation_strata not in cohort population" = all(standardisation_strata %in% names(data_cohort0)))
 
@@ -328,7 +322,7 @@ for(i in subgroups){
 
   sym_i <- sym(i)
   rates_weighted <- rounded_rates(data_combined, min_count, round_method, {{ sym_i }}, date)
-  write_csv(rates_weighted, path = fs::path(here(dir_output), glue("rates_{i}.csv")))
+  arrow::write_feather(rates_weighted, fs::path(here(dir_output), glue("rates_{i}.feather")))
   if(make_plots){
     plot_standardised_rates(
       rates_weighted,

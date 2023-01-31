@@ -23,15 +23,21 @@ actions:
     - extract
     outputs:
       moderately_sensitive:
-        cohort: output/measures/measure_death.csv
+        csv: output/measures/measure_death.csv
 
-  ## # # # # # # # # # # # # # # # # # # #
-  ## Calculate standardised rates
-  ## # # # # # # # # # # # # # # # # # # #
+  process_measures:
+    run: r:latest analysis/process_measures.R
+      --df_input output/measures/measure_death.csv
+      --dir_output output/measures/
+    needs:
+    - measures
+    outputs:
+      moderately_sensitive:
+        feather: output/measures/*.feather
 
   standardise:
     run: r:latest analysis/standardisation.R
-      --df_input output/measures/measure_death.csv
+      --df_input output/measures/measure_death.feather
       --dir_output output/standardised/
       --standardisation_strata year;sex;ageband5year;region
       --subgroups overall;ageband20year;sex;region
@@ -40,12 +46,12 @@ actions:
       --reference_population 'ONS-England-mid-year-pop'
       --min_count 6
       --round_method mid
-      --make_plot FALSE
+      --make_plot TRUE
     needs:
-    - measures
+    - process_measures
     outputs:
       moderately_sensitive:
-        csv: output/standardised/*.csv
+        feather: output/standardised/*.feather
         jpg: output/standardised/*.jpeg
 
 
