@@ -1,12 +1,55 @@
 version: '3.0'
 
 expectations:
-  population_size: 1000
+
+  population_size: 50000
 
 actions:
 
-  generate_study_population:
+  extract:
     run: cohortextractor:latest generate_cohort --study-definition study_definition
+      --index-date-range '2018-01-01 to 2021-01-01 by month'
+      --output-dir 'output/measures'
+      --output-format feather
+    needs: []
     outputs:
       highly_sensitive:
-        cohort: output/input.csv
+        cohort: output/measures/input*.feather
+
+  measures:
+    run: cohortextractor:latest generate_measures --study-definition study_definition
+      --output-dir=output/measures
+    needs:
+    - extract
+    outputs:
+      moderately_sensitive:
+        cohort: output/measures/measure_death.csv
+
+  ## # # # # # # # # # # # # # # # # # # #
+  ## Calculate standardised rates
+  ## # # # # # # # # # # # # # # # # # # #
+
+  standardise:
+    run: r:latest analysis/standardisation.R
+      --df_input output/measures/measure_death.csv
+      --dir_output output/standardised/
+      --standardisation_strata year;sex;ageband5year;region
+      --subgroups overall;ageband20year;sex;region
+      --numerator death_1year
+      --denominator population
+      --reference_population 'ONS-England-mid-year-pop'
+      --min_count 6
+      --round_method mid
+      --make_plot FALSE
+    needs:
+    - measures
+    outputs:
+      moderately_sensitive:
+        csv: output/standardised/*.csv
+        jpg: output/standardised/*.jpeg
+
+
+  ## # # # # # # # # # # # # # # # # # # #
+  ## End
+  ## # # # # # # # # # # # # # # # # # # #
+
