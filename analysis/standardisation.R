@@ -328,7 +328,7 @@ for(i in subgroups){
       rates_weighted,
       group = {{ sym_i }},
       date,
-      filename=fs::path(here(dir_output), glue("rates_{i}.jpg"))
+      filename=fs::path(here(dir_output), glue("rates_{i}.jpeg"))
     )
   }
 }
