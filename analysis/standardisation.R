@@ -137,7 +137,6 @@ data_cohort <-
   transmute(
     !!! syms(subgroups),
     !!! syms(standardisation_strata),
-    #death_1year = as.integer(death_1year),
     numerator = as.integer(.data[[numerator]]),
     denominator = as.integer(.data[[denominator]]),
     rate = value,
