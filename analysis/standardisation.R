@@ -183,6 +183,18 @@ data_reference <-
   ungroup()
 
 ## join cohort rates and reference population size ----
+# here we join reference onto cohort rather than cohort onto reference
+# this is so that strata not included in the cohort are not brought across.
+# For example, if the cohort in men in years 2020 and 2021, then a left_join(cohort, reference) ensures women and other people in other years are not included
+# using left_join(reference, cohort) instead would mean that we would have to explicit select the relevant strata in the reference population and express this as an action parameter. But this is tricky to implement.
+# The left_join(cohort, reference) approach assumes that there are no zero-count denominators in any population strata in the cohort dataset
+# This could go wrong as follows:
+## - the inclusions criteria for the cohort dataset is people aged over 18, but the actual maximum age is 85
+## - the agegroup "90+" is therefore not represented in the cohort dataset
+## - the left_join therefore doesn't bring any population info from the age 90+ reference category
+## - the reference population has therefore implicitly changed from "all adults" to "all adults in age categories "15-20" to "85-90".
+## - and there is no representation of people aged 90+
+## - This is ok, because it's not possible to include an undefined death rate in a weighted average for example, but it means populations over which comparisons are to be made are not strictly equivalent
 
 data_combined <-
   left_join(
@@ -191,7 +203,30 @@ data_combined <-
     by = c(standardisation_strata)
   )
 
-## TODO may need a test here to ensure factors have been merged as intended
+
+### test that the join was as intended (no duplicated rows, no dropped rows) ----
+
+group_count_cohort <- data_cohort %>%
+  group_by(!!!syms(standardisation_strata)) %>%
+  summarise(
+    n_cohort=n()
+  )
+
+group_count_combined <- data_combined %>%
+  group_by(!!!syms(standardisation_strata)) %>%
+  summarise(
+    n_combined=n()
+  )
+
+group_count_test <-
+  full_join(
+    group_count_cohort, group_count_combined,
+    by = c(standardisation_strata)
+  )
+
+stopifnot("some cohort rows have been dropped" = !any(group_count_test$n_cohort<group_count_test$n_combined))
+stopifnot("some cohort rows have been duplicated" = !any(group_count_test$n_cohort>group_count_test$n_combined))
+
 
 ## define function to standardise rates within specified subgroups ----
 rounded_rates <- function(data, min_count, method, ...){
