@@ -31,13 +31,17 @@ Essentially, direct standardisation answers the question: "if each cohort had th
 
 Often the comparator cohort is the reference population itself. The standardisation procedure remains the same. 
 
-This idea can be extended to other cohort characteristics, such as sex, region, ethnicity, as long as the number of poeple in each stratum is known in the reference population. 
+This idea can be extended to other cohort characteristics, such as sex, region, ethnicity, as long as the number of people in each stratum is known in the reference population. 
 
 A reference population is usually a real distribution, such as the population of England or Europe, but can be anything.
 
-Unstandardised event rates can be calculated as `R = events/people` or `events/timeatrisk`. This can be decomposed into strata-specific rates `R_i = events_i/people_i`, where `people_i` is the number of people in stratum `i`, and `event_i` is the nubmer of events in stratum `i`. This is in turn can be used to recover the overall rate: `R = sum(R_i * people_i)/sum(people_i) = sum((events_i/people_i)*people_i)/sum(people_i) = sum(events_i)/sum(people_i) = events/people`. But instead of recovering the original rate `R` using the size of each stratum in the cohort, `people_i`, we can recover an alternative rate using any other population with different stratum sizes. This leads us to standardised event rates: `R = sum(R_i * reference_i)/sum(reference_i)`, where `reference_i` is the number of people in each stratum of the reference population. 
+Unstandardised event rates can be calculated as `R = events/people` or `events/timeatrisk`. This can be decomposed into strata-specific rates `R_i = events_i/people_i`, where `people_i` is the number of people in stratum `i`, and `event_i` is the number of events in stratum `i`.
 
+_E.g. The stratum in age standardisation would be age band. How many events occurred in individuals aged between 20 -29 etc? This would need to be computed for all age bands in each cohort to match the age banding within your reference set._
 
+This in turn can be used to recover the overall rate: `R = sum(R_i * people_i)/sum(people_i) = sum((events_i/people_i)*people_i)/sum(people_i) = sum(events_i)/sum(people_i) = events/people`. But instead of recovering the original rate `R` using the size of each stratum in the cohort, `people_i`, we can recover an alternative rate using any other population with different stratum sizes. This leads us to standardised event rates: `R = sum(R_i * reference_i)/sum(reference_i)`, where `reference_i` is the number of people in each stratum of the reference population. 
+
+_E.g. For age standardisation, your alternative age standardised rate would be the sum of how many events would have happened in each of your age bands if the population was the same distribution as reference, divided by the total reference population._
 
 
 
