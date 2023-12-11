@@ -32,7 +32,7 @@ actions:
     needs:
     - measures
     outputs:
-      moderately_sensitive:
+      highly_sensitive:
         feather: output/measures/*.feather
 
   standardise:
@@ -50,7 +50,7 @@ actions:
     needs:
     - process_measures
     outputs:
-      moderately_sensitive:
+      highly_sensitive:
         feather: output/standardised/*.feather
         jpg: output/standardised/*.jpeg
 
