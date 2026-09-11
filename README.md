@@ -1,3 +1,11 @@
+-------------------------------------
+
+# :warning: DEPRECATED :warning:
+
+This reusable action has been deprecated and is no longer maintained.
+
+-------------------------------------
+
 # demographic-standardisation
 
 [View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252Fdemographic-standardisation)
